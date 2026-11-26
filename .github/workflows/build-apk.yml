@@ -23,24 +23,15 @@ jobs:
       - name: Generate Android project
         run: flutter create --platforms=android --org com.sbai --project-name sbaichat .
 
-      - name: Permanent signing key (stored on host, outside public_html)
+      - name: Signing key (from GitHub secret)
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
         run: |
-          if [ -z "$DEPLOY_KEY" ] || [ -z "$KS_PASS" ]; then echo "::error::Missing secrets DEPLOY_KEY / FTP_PASSWORD"; exit 1; fi
-          curl -fsS -H "X-Deploy-Key: $DEPLOY_KEY" "$DEPLOY?action=info"; echo
-          KS=android/app/release.jks
-          CODE=$(curl -sS -o "$KS" -w '%{http_code}' -H "X-Deploy-Key: $DEPLOY_KEY" "$DEPLOY?action=get_key")
-          if [ "$CODE" = "200" ]; then
-            echo "Using existing key"
-          else
-            rm -f "$KS"
-            keytool -genkeypair -keystore "$KS" -alias sbaichat -keyalg RSA -keysize 2048 -validity 10000 \
-              -storepass "$KS_PASS" -keypass "$KS_PASS" -dname "CN=SBAI Chat, O=SBAI, C=TH"
-            curl -fsS -H "X-Deploy-Key: $DEPLOY_KEY" --data-binary @"$KS" "$DEPLOY?action=put_key"; echo
-            echo "Created and stored new key"
-          fi
-          keytool -list -keystore "$KS" -storepass "$KS_PASS" > /dev/null
+          if [ -z "$KEYSTORE_B64" ] || [ -z "$KS_PASS" ]; then echo "::error::Missing secrets KEYSTORE_B64 / FTP_PASSWORD"; exit 1; fi
+          echo "$KEYSTORE_B64" | base64 -d > android/app/release.jks
+          keytool -list -keystore android/app/release.jks -storepass "$KS_PASS" > /dev/null
           { echo 'storeFile=release.jks'; echo "storePassword=$KS_PASS"; echo "keyPassword=$KS_PASS"; echo 'keyAlias=sbaichat'; } > android/key.properties
-          grep -c '=' android/key.properties
+          echo "key ok"
 
       - name: Patch Android project
         run: python3 tool/patch_android.py
@@ -56,17 +47,26 @@ jobs:
           NOTES: ${{ github.event.head_commit.message }}
         run: |
           set -e
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+          call() {  # retry a request until it returns JSON {"ok":true}
+            for t in 1 2 3 4 5 6; do
+              R=$(curl -sS -A "$UA" -H "X-Deploy-Key: $DEPLOY_KEY" "$@" || true)
+              if echo "$R" | grep -q '"ok":true'; then echo "$R"; return 0; fi
+              echo "retry $t: $(echo "$R" | head -c 120)" >&2
+              sleep $((t*10))
+            done
+            echo "::error::host rejected request (bot protection?)"; return 1
+          }
           up() {  # $1=local file  $2=remote name
             rm -rf chunks && mkdir chunks
             split -b 4m -d -a 4 "$1" chunks/c
             first=1
             for c in chunks/c*; do
               ap=1; [ $first = 1 ] && ap=0; first=0
-              curl -fsS --retry 3 -H "X-Deploy-Key: $DEPLOY_KEY" --data-binary @"$c" \
-                "$DEPLOY?action=put&name=$2&append=$ap" > /dev/null
+              call --data-binary @"$c" "$DEPLOY?action=put&name=$2&append=$ap" > /dev/null
             done
             SUM=$(sha256sum "$1" | cut -d' ' -f1)
-            curl -fsS -H "X-Deploy-Key: $DEPLOY_KEY" -X POST "$DEPLOY?action=commit&name=$2&sha256=$SUM"; echo
+            call -X POST "$DEPLOY?action=commit&name=$2&sha256=$SUM"
           }
           OUT=build/app/outputs/flutter-apk
           up "$OUT/app-arm64-v8a-release.apk" sbaichat.apk
