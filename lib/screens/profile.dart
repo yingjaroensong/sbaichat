@@ -5,6 +5,7 @@ import '../widgets.dart';
 import '../main.dart';
 import 'auth.dart';
 import '../background.dart';
+import '../updater.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -50,6 +51,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         trailing: const Icon(Icons.edit), onTap: () => edit('status_msg', 'ข้อความสถานะ')),
       ListTile(leading: const Icon(Icons.alternate_email), title: const Text('ID (ให้เพื่อนค้นหา)'), subtitle: Text('@${me['username']}')),
       const Divider(),
+      ListTile(leading: const Icon(Icons.system_update), title: const Text('ตรวจสอบอัปเดต'),
+        subtitle: const Text('เวอร์ชัน $kVersionName'), onTap: () => Updater.check(context, manual: true)),
       ListTile(leading: const Icon(Icons.logout, color: Colors.red), title: const Text('ออกจากระบบ', style: TextStyle(color: Colors.red)), onTap: logout),
     ]),
   );
