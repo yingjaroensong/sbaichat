@@ -15,4 +15,11 @@ for g in ['android/app/build.gradle', 'android/app/build.gradle.kts']:
         s = p.read_text()
         s = re.sub(r'minSdk(Version)?\s*=?\s*flutter\.minSdkVersion', lambda mm: ('minSdk = 23' if g.endswith('kts') else 'minSdkVersion 23'), s)
         p.write_text(s)
+# app icon
+import shutil
+for d in ['mdpi','hdpi','xhdpi','xxhdpi','xxxhdpi']:
+    src = pathlib.Path(f'assets/icons/{d}.png')
+    dst = pathlib.Path(f'android/app/src/main/res/mipmap-{d}/ic_launcher.png')
+    if src.exists() and dst.parent.exists():
+        shutil.copyfile(src, dst)
 print('patched')
