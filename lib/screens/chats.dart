@@ -18,7 +18,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
   }
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('แชท'), actions: [
+    appBar: AppBar(title: const Text('SBAI Chat 💬'), actions: [
       IconButton(icon: const Icon(Icons.group_add), tooltip: 'สร้างกลุ่ม',
         onPressed: () async { await Navigator.push(context, MaterialPageRoute(builder: (_) => const CreateGroupScreen())); load(); }),
     ]),
