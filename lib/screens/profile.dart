@@ -4,6 +4,7 @@ import '../api.dart';
 import '../widgets.dart';
 import '../main.dart';
 import 'auth.dart';
+import '../background.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -29,7 +30,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
   Future<void> logout() async {
     try { await Api.post('logout'); } catch (_) {}
-    Poller.stop(); await Api.clear();
+    Poller.stop(); Poller.lastId = 0; stopBackgroundService(); await Api.clear();
     if (mounted) Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const LoginScreen()), (_) => false);
   }
   @override
