@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'api.dart';
 import 'widgets.dart';
 import 'background.dart';
+import 'updater.dart';
 import 'screens/auth.dart';
 import 'screens/friends.dart';
 import 'screens/chats.dart';
@@ -130,6 +131,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Future<void> _setup() async {
     try { await requestNotificationPermission(); } catch (_) {}
     try { await initBackgroundService(); } catch (_) {}
+    Future.delayed(const Duration(seconds: 2), () { if (mounted) Updater.check(context); });
     if (pendingPayload != null) {
       final x = pendingPayload; pendingPayload = null;
       WidgetsBinding.instance.addPostFrameCallback((_) => openFromPayload(x));
@@ -154,6 +156,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState s) async {
     if (s == AppLifecycleState.resumed) {
       Poller.start();
+      if (mounted) Updater.check(context);
     } else if (s == AppLifecycleState.paused || s == AppLifecycleState.detached) {
       Poller.stop();
       (await SharedPreferences.getInstance()).setInt('fg_ts', 0);
