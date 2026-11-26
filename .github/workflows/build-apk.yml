@@ -39,7 +39,8 @@ jobs:
             echo "Created and stored new key"
           fi
           keytool -list -keystore "$KS" -storepass "$KS_PASS" > /dev/null
-          printf 'storeFile=release.jks\nstorePassword=[REDACTED_PASSWORD]=%s\nkeyAlias=sbaichat\n' "$KS_PASS" "$KS_PASS" > android/key.properties
+          { echo 'storeFile=release.jks'; echo "storePassword=$KS_PASS"; echo "keyPassword=$KS_PASS"; echo 'keyAlias=sbaichat'; } > android/key.properties
+          grep -c '=' android/key.properties
 
       - name: Patch Android project
         run: python3 tool/patch_android.py
