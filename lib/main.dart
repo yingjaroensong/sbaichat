@@ -89,10 +89,10 @@ class Poller {
         tick.value++;
         final myId = Api.me?['id'];
         for (final m in msgs) {
-          if (m['sender_id'] != myId && m['conversation_id'] != openConversation && m['type'] != 'system') {
+          if (m['sender_id'] != myId && m['conversation_id'] != openConversation && m['type'] != 'system' && m['type'] != 'deleted') {
             final ctx = navKey.currentContext;
             if (ctx != null) {
-              final txt = m['type'] == 'image' ? 'ส่งรูปภาพ' : m['type'] == 'sticker' ? 'ส่งสติกเกอร์' : m['content'];
+              final txt = switch (m['type']) { 'image' => 'ส่งรูปภาพ', 'sticker' => 'ส่งสติกเกอร์', 'file' => 'ส่งไฟล์ ${m['file_name'] ?? ''}', 'voice' => 'ส่งข้อความเสียง', _ => m['content'] };
               ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text('${m['sender_name']}: $txt'), duration: const Duration(seconds: 2)));
             }
           }
