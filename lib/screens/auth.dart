@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../api.dart';
 import '../widgets.dart';
 import '../main.dart';
+import '../updater.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,6 +11,13 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final u = TextEditingController(), p = TextEditingController(), n = TextEditingController();
   bool register = false, busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // check for a new version even before login
+    Future.delayed(const Duration(seconds: 1), () { if (mounted) Updater.check(context); });
+  }
 
   Future<void> submit() async {
     setState(() => busy = true);
@@ -44,6 +52,10 @@ class _LoginScreenState extends State<LoginScreen> {
         child: busy ? const CircularProgressIndicator(color: Colors.white) : Text(register ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ', style: const TextStyle(fontSize: 17)))),
       TextButton(onPressed: () => setState(() => register = !register),
         child: Text(register ? 'มีบัญชีแล้ว? เข้าสู่ระบบ' : 'ยังไม่มีบัญชี? สมัครสมาชิก')),
+      const SizedBox(height: 16),
+      TextButton.icon(onPressed: () => Updater.check(context, manual: true),
+        icon: const Icon(Icons.system_update, size: 18),
+        label: Text('ตรวจสอบอัปเดต ($kVersionName)', style: const TextStyle(color: Colors.grey))),
     ])))),
   );
 }
