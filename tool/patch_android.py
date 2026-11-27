@@ -22,6 +22,7 @@ for g in ['android/app/build.gradle', 'android/app/build.gradle.kts']:
     p = pathlib.Path(g)
     if p.exists():
         s = p.read_text()
+        s = re.sub(r'compileSdk(Version)?\s*=?\s*flutter\.compileSdkVersion', lambda mm: ('compileSdk = 35' if g.endswith('kts') else 'compileSdk 35'), s)
         s = re.sub(r'minSdk(Version)?\s*=?\s*flutter\.minSdkVersion', lambda mm: ('minSdk = 23' if g.endswith('kts') else 'minSdkVersion 23'), s)
         if g.endswith('kts'):
             if 'isCoreLibraryDesugaringEnabled' not in s:
