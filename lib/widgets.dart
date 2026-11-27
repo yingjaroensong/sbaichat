@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-const kGreen = Color(0xFF06C755);
+const kPrimary = Color(0xFFE6197A); // SBAI pink
+const kCallGreen = Color(0xFF06C755); // answer-call button
 
 class Avatar extends StatelessWidget {
   final String? url; final String name; final double size;
@@ -9,9 +10,9 @@ class Avatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final letter = name.isNotEmpty ? name.characters.first.toUpperCase() : '?';
     return CircleAvatar(
-      radius: size / 2, backgroundColor: kGreen.withOpacity(.18),
+      radius: size / 2, backgroundColor: kPrimary.withOpacity(.18),
       backgroundImage: (url != null && url!.isNotEmpty) ? NetworkImage(url!) : null,
-      child: (url == null || url!.isEmpty) ? Text(letter, style: TextStyle(color: kGreen, fontWeight: FontWeight.bold, fontSize: size * .4)) : null,
+      child: (url == null || url!.isEmpty) ? Text(letter, style: TextStyle(color: kPrimary, fontWeight: FontWeight.bold, fontSize: size * .4)) : null,
     );
   }
 }
