@@ -27,8 +27,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     body: SafeArea(child: Center(child: SingleChildScrollView(padding: const EdgeInsets.all(28), child: Column(children: [
-      const Icon(Icons.chat_rounded, size: 80, color: kGreen),
-      const Text('SBAI Chat', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: kGreen)),
+      const Icon(Icons.chat_rounded, size: 80, color: kPrimary),
+      const Text('SBAI Chat', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: kPrimary)),
       const SizedBox(height: 28),
       TextField(controller: u, decoration: const InputDecoration(labelText: 'Username (a-z, 0-9)', border: OutlineInputBorder())),
       const SizedBox(height: 12),
@@ -39,7 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
       TextField(controller: p, obscureText: true, decoration: const InputDecoration(labelText: 'รหัสผ่าน (6 ตัวขึ้นไป)', border: OutlineInputBorder())),
       const SizedBox(height: 20),
       SizedBox(width: double.infinity, height: 50, child: FilledButton(
-        style: FilledButton.styleFrom(backgroundColor: kGreen),
+        style: FilledButton.styleFrom(backgroundColor: kPrimary),
         onPressed: busy ? null : submit,
         child: busy ? const CircularProgressIndicator(color: Colors.white) : Text(register ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ', style: const TextStyle(fontSize: 17)))),
       TextButton(onPressed: () => setState(() => register = !register),
