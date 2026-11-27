@@ -41,7 +41,7 @@ class Updater {
         content: Text('เวอร์ชันปัจจุบัน: $kVersionName\n\n${(j['notes'] ?? '').toString()}'.trim()),
         actions: [
           TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('ภายหลัง')),
-          FilledButton(style: FilledButton.styleFrom(backgroundColor: kGreen),
+          FilledButton(style: FilledButton.styleFrom(backgroundColor: kPrimary),
               onPressed: () => Navigator.pop(c, true), child: const Text('อัปเดตเลย')),
         ]));
       if (ok == true && context.mounted) await _download(context, url, latest);
@@ -60,7 +60,7 @@ class Updater {
       title: const Text('กำลังดาวน์โหลดอัปเดต'),
       content: ValueListenableBuilder<double?>(valueListenable: progress, builder: (_, p, __) => Column(
         mainAxisSize: MainAxisSize.min, children: [
-          LinearProgressIndicator(value: p, color: kGreen),
+          LinearProgressIndicator(value: p, color: kPrimary),
           const SizedBox(height: 12),
           Text(p == null ? 'กำลังเชื่อมต่อ...' : '${(p * 100).toStringAsFixed(0)}%'),
         ])),
