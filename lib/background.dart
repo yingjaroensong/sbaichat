@@ -53,6 +53,8 @@ String _preview(Map m) {
   switch (m['type']) {
     case 'image': return 'ส่งรูปภาพ';
     case 'sticker': return 'ส่งสติกเกอร์ ${m['content'] ?? ''}';
+    case 'file': return 'ส่งไฟล์ ${m['file_name'] ?? ''}';
+    case 'voice': return 'ส่งข้อความเสียง';
     default: return (m['content'] ?? '').toString();
   }
 }
@@ -87,7 +89,7 @@ void onStart(ServiceInstance service) async {
       if (DateTime.now().millisecondsSinceEpoch - fgTs < 8000) return;
       if (since == 0) return;
       for (final m in (j['messages'] as List)) {
-        if (m['sender_id'] == myId || m['type'] == 'system') continue;
+        if (m['sender_id'] == myId || m['type'] == 'system' || m['type'] == 'deleted') continue;
         final isGroup = m['conv_type'] == 'group';
         final sender = (m['sender_name'] ?? '').toString();
         final title = isGroup ? (m['conv_name'] ?? 'กลุ่ม').toString() : sender;
