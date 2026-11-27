@@ -42,7 +42,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
           leading: Avatar(r['user']['avatar_url'], r['user']['display_name']),
           title: Text(r['user']['display_name']), subtitle: Text('@${r['user']['username']}'),
           trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-            IconButton(icon: const Icon(Icons.check_circle, color: kGreen), onPressed: () => respond(r['request_id'], true)),
+            IconButton(icon: const Icon(Icons.check_circle, color: kPrimary), onPressed: () => respond(r['request_id'], true)),
             IconButton(icon: const Icon(Icons.cancel, color: Colors.grey), onPressed: () => respond(r['request_id'], false)),
           ])),
       ],
@@ -86,7 +86,7 @@ class FriendSheet extends StatelessWidget {
     ]));
   }
   Widget _btn(IconData i, String t, VoidCallback onTap) => InkWell(onTap: onTap, child: Padding(padding: const EdgeInsets.all(8),
-      child: Column(children: [Icon(i, color: kGreen, size: 32), const SizedBox(height: 4), Text(t)])));
+      child: Column(children: [Icon(i, color: kPrimary, size: 32), const SizedBox(height: 4), Text(t)])));
 }
 
 class AddFriendScreen extends StatefulWidget {
@@ -118,10 +118,10 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
           leading: Avatar(u['avatar_url'], u['display_name']),
           title: Text(u['display_name']), subtitle: Text('@${u['username']}'),
           trailing: switch (u['friend_status']) {
-            'accepted' => const Text('เพื่อน', style: TextStyle(color: kGreen)),
+            'accepted' => const Text('เพื่อน', style: TextStyle(color: kPrimary)),
             'pending' => u['request_from_me'] == true ? const Text('รอตอบรับ') :
                 FilledButton(onPressed: () => add(u), child: const Text('ยอมรับ')),
-            _ => FilledButton(style: FilledButton.styleFrom(backgroundColor: kGreen), onPressed: () => add(u), child: const Text('เพิ่ม')),
+            _ => FilledButton(style: FilledButton.styleFrom(backgroundColor: kPrimary), onPressed: () => add(u), child: const Text('เพิ่ม')),
           }),
       ])),
     ]),
