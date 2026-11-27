@@ -51,7 +51,7 @@ class SbaiApp extends StatelessWidget {
         navigatorKey: navKey,
         title: 'SBAI Chat',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(colorSchemeSeed: kGreen, useMaterial3: true,
+        theme: ThemeData(colorSchemeSeed: kPrimary, useMaterial3: true,
             appBarTheme: const AppBarTheme(backgroundColor: Colors.white, surfaceTintColor: Colors.white)),
         home: Api.token == null ? const LoginScreen() : const HomeScreen(),
       );
