@@ -35,8 +35,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     body: SafeArea(child: Center(child: SingleChildScrollView(padding: const EdgeInsets.all(28), child: Column(children: [
-      const Icon(Icons.chat_rounded, size: 80, color: kPrimary),
-      const Text('SBAI Chat', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: kPrimary)),
+      ClipRRect(borderRadius: BorderRadius.circular(32),
+        child: Image.asset('assets/images/logo.png', width: 160, height: 160, fit: BoxFit.cover)),
       const SizedBox(height: 28),
       TextField(controller: u, decoration: const InputDecoration(labelText: 'Username (a-z, 0-9)', border: OutlineInputBorder())),
       const SizedBox(height: 12),
