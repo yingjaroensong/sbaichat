@@ -79,7 +79,7 @@ class _ChatScreenState extends State<ChatScreen> {
           child: Row(mainAxisSize: MainAxisSize.min, children: [const Icon(Icons.call, size: 18), const SizedBox(width: 6), Text(m['content'] ?? '')])); break;
       default: content = Container(constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * .7),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(color: mine ? const Color(0xFF8DE055) : Colors.white, borderRadius: BorderRadius.circular(16)),
+          decoration: BoxDecoration(color: mine ? const Color(0xFFFFC1DD) : Colors.white, borderRadius: BorderRadius.circular(16)),
           child: Text(m['content'] ?? '', style: const TextStyle(fontSize: 15)));
     }
     final meta = Column(crossAxisAlignment: mine ? CrossAxisAlignment.end : CrossAxisAlignment.start, children: [
@@ -99,7 +99,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     final peer = widget.peer;
     return Scaffold(
-      backgroundColor: const Color(0xFF8CABD8),
+      backgroundColor: const Color(0xFFFCE4EF),
       appBar: AppBar(title: Text(widget.title), actions: [
         if (!widget.isGroup && peer != null) ...[
           IconButton(icon: const Icon(Icons.call), onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) =>
@@ -121,7 +121,7 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(icon: const Icon(Icons.emoji_emotions_outlined), onPressed: () => setState(() => showStickers = !showStickers)),
           Expanded(child: TextField(controller: input, minLines: 1, maxLines: 4, textInputAction: TextInputAction.send, onSubmitted: (_) => sendText(),
             decoration: const InputDecoration(hintText: 'Aa', border: InputBorder.none))),
-          IconButton(icon: const Icon(Icons.send, color: kGreen), onPressed: sending ? null : sendText),
+          IconButton(icon: const Icon(Icons.send, color: kPrimary), onPressed: sending ? null : sendText),
         ]))),
       ]),
     );
@@ -165,12 +165,12 @@ class _GroupInfoScreenState extends State<GroupInfoScreen> {
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: const Text('ข้อมูลกลุ่ม')),
     body: conv == null ? const Center(child: CircularProgressIndicator()) : ListView(children: [
-      ListTile(leading: const Icon(Icons.groups, color: kGreen, size: 40), title: Text(conv!['name'] ?? '', style: const TextStyle(fontSize: 20)),
+      ListTile(leading: const Icon(Icons.groups, color: kPrimary, size: 40), title: Text(conv!['name'] ?? '', style: const TextStyle(fontSize: 20)),
         trailing: IconButton(icon: const Icon(Icons.edit), onPressed: rename)),
       ListTile(leading: const Icon(Icons.person_add), title: const Text('เพิ่มสมาชิก'), onTap: addMembers),
       const Divider(),
       for (final m in conv!['members']) ListTile(leading: Avatar(m['avatar_url'], m['display_name']), title: Text(m['display_name']),
-        trailing: m['role'] == 'admin' ? const Text('แอดมิน', style: TextStyle(color: kGreen)) : null),
+        trailing: m['role'] == 'admin' ? const Text('แอดมิน', style: TextStyle(color: kPrimary)) : null),
       const Divider(),
       ListTile(leading: const Icon(Icons.logout, color: Colors.red), title: const Text('ออกจากกลุ่ม', style: TextStyle(color: Colors.red)), onTap: leave),
     ]),
