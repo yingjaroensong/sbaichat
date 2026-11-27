@@ -41,7 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       const SizedBox(height: 24),
       Center(child: Stack(children: [
         Avatar(me['avatar_url'], me['display_name'] ?? '', size: 120),
-        Positioned(right: 0, bottom: 0, child: CircleAvatar(backgroundColor: kGreen,
+        Positioned(right: 0, bottom: 0, child: CircleAvatar(backgroundColor: kPrimary,
           child: IconButton(icon: const Icon(Icons.camera_alt, color: Colors.white, size: 20), onPressed: pickAvatar))),
       ])),
       const SizedBox(height: 16),
