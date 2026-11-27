@@ -30,14 +30,14 @@ class _ChatsScreenState extends State<ChatsScreen> {
           final name = c['name'] ?? '';
           return ListTile(
             leading: c['type'] == 'group' && (c['avatar_url'] == null)
-              ? const CircleAvatar(radius: 22, backgroundColor: Color(0x2206C755), child: Icon(Icons.groups, color: kGreen))
+              ? const CircleAvatar(radius: 22, backgroundColor: Color(0x22E6197A), child: Icon(Icons.groups, color: kPrimary))
               : Avatar(c['avatar_url'], name),
             title: Text(c['type'] == 'group' ? '$name (${c['member_count']})' : name, maxLines: 1, overflow: TextOverflow.ellipsis),
             subtitle: Text(lm?['content'] ?? '', maxLines: 1, overflow: TextOverflow.ellipsis),
             trailing: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
               Text(hhmm(c['updated_at']), style: const TextStyle(fontSize: 12, color: Colors.grey)),
               if ((c['unread'] ?? 0) > 0) Container(margin: const EdgeInsets.only(top: 4), padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                decoration: BoxDecoration(color: kGreen, borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(color: kPrimary, borderRadius: BorderRadius.circular(10)),
                 child: Text('${c['unread']}', style: const TextStyle(color: Colors.white, fontSize: 12))),
             ]),
             onTap: () async {
