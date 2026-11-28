@@ -76,7 +76,7 @@ void onStart(ServiceInstance service) async {
       if (token == null) return;
       final myId = jsonDecode(p.getString('me') ?? '{}')['id'];
       final since = p.getInt('bg_last_id') ?? 0;
-      final r = await http.get(Uri.parse('$kBase?action=poll&since_id=$since'),
+      final r = await http.get(Uri.parse('$kBase?action=poll&bg=1&since_id=$since'),
           headers: {'X-Auth-Token': token}).timeout(const Duration(seconds: 15));
       final j = jsonDecode(utf8.decode(r.bodyBytes));
       if (j['ok'] != true) return;
@@ -89,7 +89,7 @@ void onStart(ServiceInstance service) async {
       if (DateTime.now().millisecondsSinceEpoch - fgTs < 8000) return;
       if (since == 0) return;
       for (final m in (j['messages'] as List)) {
-        if (m['sender_id'] == myId || m['type'] == 'system' || m['type'] == 'deleted') continue;
+        if (m['sender_id'] == myId || m['type'] == 'system' || m['type'] == 'deleted' || m['type'] == 'edited' || m['muted'] == 1) continue;
         final isGroup = m['conv_type'] == 'group';
         final sender = (m['sender_name'] ?? '').toString();
         final title = isGroup ? (m['conv_name'] ?? 'กลุ่ม').toString() : sender;
