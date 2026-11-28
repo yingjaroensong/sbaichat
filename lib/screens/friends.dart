@@ -24,7 +24,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
   Future<void> respond(int id, bool ok) async {
     try { await Api.post('friend_respond', {'request_id': id, 'accept': ok ? 1 : 0}); load(); } catch (e) { toast(context, e); }
   }
-  void openFriend(Map f) => showModalBottomSheet(context: context, builder: (_) => FriendSheet(f));
+  void openFriend(Map f) => showModalBottomSheet(context: context, builder: (_) => FriendSheet(f, onChanged: load));
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -57,7 +57,8 @@ class _FriendsScreenState extends State<FriendsScreen> {
 }
 
 class FriendSheet extends StatelessWidget {
-  final Map f; const FriendSheet(this.f, {super.key});
+  final Map f; final VoidCallback? onChanged;
+  const FriendSheet(this.f, {super.key, this.onChanged});
   @override
   Widget build(BuildContext context) {
     Future<void> chat() async {
@@ -68,6 +69,19 @@ class FriendSheet extends StatelessWidget {
         Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen(conversationId: r['conversation_id'], title: f['display_name'], peer: f)));
       } catch (e) { toast(context, e); }
     }
+    Future<void> act(String action, String question, String done) async {
+      final ok = await showDialog<bool>(context: context, builder: (d) => AlertDialog(title: Text(question),
+        actions: [TextButton(onPressed: () => Navigator.pop(d, false), child: const Text('ยกเลิก')),
+                  FilledButton(style: FilledButton.styleFrom(backgroundColor: Colors.red), onPressed: () => Navigator.pop(d, true), child: const Text('ยืนยัน'))]));
+      if (ok != true || !context.mounted) return;
+      try {
+        await Api.post(action, {'user_id': f['id']});
+        if (!context.mounted) return;
+        toast(context, done);
+        Navigator.pop(context);
+        onChanged?.call();
+      } catch (e) { if (context.mounted) toast(context, e); }
+    }
     void call(bool video) {
       Navigator.pop(context);
       Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen.outgoing(peerId: f['id'], peerName: f['display_name'], peerAvatar: f['avatar_url'], video: video)));
@@ -77,11 +91,20 @@ class FriendSheet extends StatelessWidget {
       const SizedBox(height: 12),
       Text(f['display_name'], style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
       if (f['status_msg'] != null) Text(f['status_msg'], style: const TextStyle(color: Colors.grey)),
+      if (fmtLastSeen(f['last_seen']).isNotEmpty) Padding(padding: const EdgeInsets.only(top: 4),
+        child: Text(fmtLastSeen(f['last_seen']), style: const TextStyle(color: kPrimary, fontSize: 12))),
       const SizedBox(height: 20),
       Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
         _btn(Icons.chat_bubble, 'แชท', chat),
         _btn(Icons.call, 'โทร', () => call(false)),
         _btn(Icons.videocam, 'วิดีโอคอล', () => call(true)),
+      ]),
+      const SizedBox(height: 8),
+      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        TextButton.icon(icon: const Icon(Icons.person_remove_outlined, color: Colors.grey), label: const Text('ลบเพื่อน', style: TextStyle(color: Colors.grey)),
+          onPressed: () => act('friend_remove', 'ลบ ${f['display_name']} ออกจากเพื่อน?', 'ลบเพื่อนแล้ว')),
+        TextButton.icon(icon: const Icon(Icons.block, color: Colors.red), label: const Text('บล็อก', style: TextStyle(color: Colors.red)),
+          onPressed: () => act('block_user', 'บล็อก ${f['display_name']}? (จะแชทและโทรหาคุณไม่ได้)', 'บล็อกแล้ว')),
       ]),
     ]));
   }
@@ -121,6 +144,8 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
             'accepted' => const Text('เพื่อน', style: TextStyle(color: kPrimary)),
             'pending' => u['request_from_me'] == true ? const Text('รอตอบรับ') :
                 FilledButton(onPressed: () => add(u), child: const Text('ยอมรับ')),
+            'blocked' => const Text('บล็อกแล้ว', style: TextStyle(color: Colors.grey)),
+            'unavailable' => const Text('เพิ่มไม่ได้', style: TextStyle(color: Colors.grey)),
             _ => FilledButton(style: FilledButton.styleFrom(backgroundColor: kPrimary), onPressed: () => add(u), child: const Text('เพิ่ม')),
           }),
       ])),
