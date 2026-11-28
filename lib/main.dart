@@ -89,7 +89,7 @@ class Poller {
         tick.value++;
         final myId = Api.me?['id'];
         for (final m in msgs) {
-          if (m['sender_id'] != myId && m['conversation_id'] != openConversation && m['type'] != 'system' && m['type'] != 'deleted') {
+          if (m['sender_id'] != myId && m['conversation_id'] != openConversation && m['type'] != 'system' && m['type'] != 'deleted' && m['type'] != 'edited' && m['muted'] != 1) {
             final ctx = navKey.currentContext;
             if (ctx != null) {
               final txt = switch (m['type']) { 'image' => 'ส่งรูปภาพ', 'sticker' => 'ส่งสติกเกอร์', 'file' => 'ส่งไฟล์ ${m['file_name'] ?? ''}', 'voice' => 'ส่งข้อความเสียง', _ => m['content'] };
