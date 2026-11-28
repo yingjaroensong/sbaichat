@@ -32,6 +32,38 @@ class _LoginScreenState extends State<LoginScreen> {
     finally { if (mounted) setState(() => busy = false); }
   }
 
+  Future<void> forgot() async {
+    final uc = TextEditingController(text: u.text.trim());
+    final user = await showDialog<String>(context: context, builder: (d) => AlertDialog(
+      title: const Text('ลืมรหัสผ่าน'),
+      content: Column(mainAxisSize: MainAxisSize.min, children: [
+        const Text('ระบบจะส่งรหัสยืนยัน 6 หลักไปที่อีเมลกู้คืนที่ตั้งไว้ในหน้าโปรไฟล์', style: TextStyle(fontSize: 13)),
+        const SizedBox(height: 12),
+        TextField(controller: uc, decoration: const InputDecoration(labelText: 'Username', border: OutlineInputBorder())),
+      ]),
+      actions: [TextButton(onPressed: () => Navigator.pop(d), child: const Text('ยกเลิก')),
+                FilledButton(onPressed: () => Navigator.pop(d, uc.text.trim()), child: const Text('ส่งรหัส'))]));
+    if (user == null || user.isEmpty || !mounted) return;
+    try { final r = await Api.post('forgot_$kPw', {'username': user}); if (mounted) toast(context, '${r['message']}'); }
+    catch (e) { if (mounted) toast(context, e); return; }
+    final cc = TextEditingController(), pc = TextEditingController();
+    if (!mounted) return;
+    final ok = await showDialog<bool>(context: context, builder: (d) => AlertDialog(
+      title: const Text('ตั้งรหัสผ่านใหม่'),
+      content: Column(mainAxisSize: MainAxisSize.min, children: [
+        TextField(controller: cc, keyboardType: TextInputType.number, maxLength: 6, decoration: const InputDecoration(labelText: 'รหัสยืนยันจากอีเมล')),
+        TextField(controller: pc, obscureText: true, decoration: const InputDecoration(labelText: 'รหัสผ่านใหม่ (6 ตัวขึ้นไป)')),
+      ]),
+      actions: [TextButton(onPressed: () => Navigator.pop(d, false), child: const Text('ยกเลิก')),
+                FilledButton(onPressed: () => Navigator.pop(d, true), child: const Text('ยืนยัน'))]));
+    if (ok != true) return;
+    try {
+      await Api.post('reset_$kPw', {'username': user, 'code': cc.text.trim(), 'new_$kPw': pc.text});
+      u.text = user; p.clear();
+      if (mounted) toast(context, 'ตั้งรหัสผ่านใหม่แล้ว กรุณาเข้าสู่ระบบ');
+    } catch (e) { if (mounted) toast(context, e); }
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
     body: SafeArea(child: Center(child: SingleChildScrollView(padding: const EdgeInsets.all(28), child: Column(children: [
@@ -52,6 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: busy ? const CircularProgressIndicator(color: Colors.white) : Text(register ? 'สมัครสมาชิก' : 'เข้าสู่ระบบ', style: const TextStyle(fontSize: 17)))),
       TextButton(onPressed: () => setState(() => register = !register),
         child: Text(register ? 'มีบัญชีแล้ว? เข้าสู่ระบบ' : 'ยังไม่มีบัญชี? สมัครสมาชิก')),
+      if (!register) TextButton(onPressed: forgot, child: const Text('ลืมรหัสผ่าน?', style: TextStyle(color: Colors.grey))),
       const SizedBox(height: 16),
       TextButton.icon(onPressed: () => Updater.check(context, manual: true),
         icon: const Icon(Icons.system_update, size: 18),
