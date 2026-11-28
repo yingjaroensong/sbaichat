@@ -42,7 +42,16 @@ jobs:
             --build-number=$BUILD_NO --build-name=1.0.$BUILD_NO --dart-define=BUILD_NUMBER=$BUILD_NO
           ls -la build/app/outputs/flutter-apk/
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbaichat-apk
+          path: |
+            build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+            build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+          compression-level: 0
+
       - name: Deploy to sbaichat.com/download
+        continue-on-error: true
         env:
           NOTES: ${{ github.event.head_commit.message }}
         run: |
@@ -83,7 +92,3 @@ jobs:
           cat version.json
           up version.json version.json
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: sbaichat-apk
-          path: build/app/outputs/flutter-apk/*.apk
