@@ -265,6 +265,16 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(icon: const Icon(Icons.videocam), onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) =>
               CallScreen.outgoing(peerId: peer['id'], peerName: peer['display_name'], peerAvatar: peer['avatar_url'], video: true)))),
         ],
+        PopupMenuButton<String>(onSelected: (v) async {
+          if (v != 'del') return;
+          final ok = await showDialog<bool>(context: context, builder: (d) => AlertDialog(
+            title: const Text('ลบแชทนี้?'), content: const Text('ประวัติแชทจะถูกลบจากเครื่องของคุณ (อีกฝ่ายยังเห็นอยู่)'),
+            actions: [TextButton(onPressed: () => Navigator.pop(d, false), child: const Text('ยกเลิก')),
+                      FilledButton(style: FilledButton.styleFrom(backgroundColor: Colors.red), onPressed: () => Navigator.pop(d, true), child: const Text('ลบแชท'))]));
+          if (ok != true) return;
+          try { await Api.post('delete_chat', {'conversation_id': widget.conversationId}); if (mounted) Navigator.pop(context); }
+          catch (e) { if (mounted) toast(context, e); }
+        }, itemBuilder: (_) => const [PopupMenuItem(value: 'del', child: Text('ลบแชท', style: TextStyle(color: Colors.red)))]),
         if (widget.isGroup) IconButton(icon: const Icon(Icons.info_outline), onPressed: () async {
             final n = await Navigator.push<String>(context, MaterialPageRoute(builder: (_) => GroupInfoScreen(widget.conversationId)));
             if (n != null && mounted) setState(() => title = n);
