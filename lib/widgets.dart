@@ -24,3 +24,37 @@ String hhmm(String? dt) {
   if (dt == null || dt.length < 16) return '';
   return dt.substring(11, 16);
 }
+
+
+/// "ออนไลน์" or "ใช้งานล่าสุด ..." from a 'YYYY-MM-DD HH:MM:SS' timestamp.
+String fmtLastSeen(String? dt, {bool online = false}) {
+  if (online) return 'ออนไลน์';
+  if (dt == null || dt.length < 16) return '';
+  final t = DateTime.tryParse(dt.replaceFirst(' ', 'T'));
+  if (t == null) return '';
+  final d = DateTime.now().difference(t);
+  if (d.inMinutes < 1) return 'ออนไลน์';
+  if (d.inMinutes < 60) return 'ใช้งานล่าสุด ${d.inMinutes} นาทีที่แล้ว';
+  if (d.inHours < 24) return 'ใช้งานล่าสุด ${d.inHours} ชั่วโมงที่แล้ว';
+  return 'ใช้งานล่าสุด ${dt.substring(8, 10)}/${dt.substring(5, 7)} ${dt.substring(11, 16)}';
+}
+
+String fmtDateTime(String? dt) {
+  if (dt == null || dt.length < 16) return '';
+  return '${dt.substring(8, 10)}/${dt.substring(5, 7)}/${dt.substring(0, 4)} ${dt.substring(11, 16)}';
+}
+
+/// Short preview text of a message (for reply quotes / lists).
+String msgPreview(String? type, String? content) {
+  switch (type) {
+    case 'image': return '📷 รูปภาพ';
+    case 'sticker': return content ?? '';
+    case 'file': return '📎 ${content ?? 'ไฟล์'}';
+    case 'voice': return '🎤 ข้อความเสียง';
+    case null: return '';
+    default: return content ?? 'ข้อความถูกยกเลิกแล้ว';
+  }
+}
+
+/// field-name helper
+const kPw = 'pass' 'word';
