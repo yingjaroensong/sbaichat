@@ -12,6 +12,16 @@ class _ChatsScreenState extends State<ChatsScreen> {
   List convs = []; bool loading = true;
   @override void initState() { super.initState(); load(); Poller.tick.addListener(load); }
   @override void dispose() { Poller.tick.removeListener(load); super.dispose(); }
+  Future<void> deleteChat(Map c) async {
+    final ok = await showDialog<bool>(context: context, builder: (d) => AlertDialog(
+      title: const Text('ลบแชทนี้?'),
+      content: Text('ประวัติแชท "${c['name'] ?? ''}" จะถูกลบจากเครื่องของคุณ (อีกฝ่ายยังเห็นอยู่)'),
+      actions: [TextButton(onPressed: () => Navigator.pop(d, false), child: const Text('ยกเลิก')),
+                FilledButton(style: FilledButton.styleFrom(backgroundColor: Colors.red), onPressed: () => Navigator.pop(d, true), child: const Text('ลบแชท'))]));
+    if (ok != true) return;
+    try { await Api.post('delete_chat', {'conversation_id': c['id']}); setState(() => convs.removeWhere((x) => x['id'] == c['id'])); if (mounted) toast(context, 'ลบแชทแล้ว'); }
+    catch (e) { if (mounted) toast(context, e); }
+  }
   Future<void> load() async {
     try { final r = await Api.get('conversations'); if (mounted) setState(() { convs = r['conversations']; loading = false; }); }
     catch (_) { if (mounted) setState(() => loading = false); }
@@ -40,6 +50,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
                 decoration: BoxDecoration(color: kPrimary, borderRadius: BorderRadius.circular(10)),
                 child: Text('${c['unread']}', style: const TextStyle(color: Colors.white, fontSize: 12))),
             ]),
+            onLongPress: () => deleteChat(c),
             onTap: () async {
               await Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen(conversationId: c['id'], title: name, peer: c['peer'], isGroup: c['type'] == 'group')));
               load();
