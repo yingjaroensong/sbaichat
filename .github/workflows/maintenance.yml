@@ -1,0 +1,25 @@
+name: Maintenance
+on:
+  schedule:
+    - cron: '0 20 * * *'   # 03:00 Asia/Bangkok every day
+  workflow_dispatch:
+jobs:
+  maintain:
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY: https://sbaichat.com/api/deploy.php
+      DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+    steps:
+      - name: Backup database and clean old files
+        run: |
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+          for a in backup cleanup; do
+            ok=0
+            for t in 1 2 3 4 5; do
+              R=$(curl -sS -A "$UA" -H "X-Deploy-Key: $DEPLOY_KEY" "$DEPLOY?action=$a" || true)
+              if echo "$R" | grep -q '"ok":true'; then echo "$a: $R"; ok=1; break; fi
+              echo "retry $t ($a): $(echo "$R" | head -c 120)"
+              sleep $((t*20))
+            done
+            [ $ok = 1 ] || { echo "::error::$a failed"; exit 1; }
+          done
